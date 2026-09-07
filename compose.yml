@@ -1,0 +1,11 @@
+include:
+- booking_backend/compose.yml
+- payment_order_backend/compose.yml
+- catalog_backend/compose.yml
+- notification_backend/compose.yml
+- frontend/compose.yml
+
+
+networks:
+  app_net:
+    driver: bridge
