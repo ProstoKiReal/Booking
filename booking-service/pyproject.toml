@@ -1,0 +1,17 @@
+[project]
+name = "booking-service"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.20.0",
+    "asyncpg>=0.31.0",
+    "dishka>=1.10.1",
+    "dishka-faststream>=0.7.0",
+    "fastapi>=0.141.1",
+    "faststream>=0.7.5",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy>=2.0.54",
+    "uvicorn>=0.53.0",
+]
