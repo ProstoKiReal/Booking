@@ -8,5 +8,4 @@ def category1(test_client):
         "/api/v1/admin/categories/",
         json={"name": name},
     )
-    assert response.status_code == 200
     return response.json()

@@ -10,7 +10,7 @@ class TestCreateCategory:
         )
         resp_data = resp .json()
 
-        assert resp .status_code == 200
+        assert resp .status_code == 201
         assert resp_data["id"]
         assert resp_data["name"] == name.strip()
 
@@ -58,5 +58,5 @@ class TestCreateCategory:
             json={"name": name},
         )
 
-        assert resp.status_code == 200
+        assert resp.status_code == 201
         assert resp.json()["name"] == name
