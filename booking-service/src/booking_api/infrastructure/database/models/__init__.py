@@ -13,14 +13,14 @@ mapper_registry.map_imperatively(
     EventSaModel,
     events_table,
     properties={
-        "categories": relationship(CategorySaModel, back_populates="event"),
+        "category": relationship(CategorySaModel, back_populates="events"),
         "images": relationship(ImageSaModel, back_populates="event"),
     },
 )
 mapper_registry.map_imperatively(
     CategorySaModel,
     categories_table,
-    properties={"event": relationship(EventSaModel, back_populates="categories")},
+    properties={"events": relationship(EventSaModel, back_populates="category")},
 )
 mapper_registry.map_imperatively(
     ImageSaModel,

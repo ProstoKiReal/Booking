@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from booking_api.presentation.http.v1.routers.admin.event_router import router as event_router
+from booking_api.presentation.http.v1.routers.admin.category_router import router as category_router
 
 
 admin_router = APIRouter(
@@ -10,6 +11,7 @@ admin_router = APIRouter(
 
 routers = [
     event_router,
+    category_router,
 ]
 
 for router in routers:

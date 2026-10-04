@@ -3,18 +3,36 @@
 **Приложение создано в учебных целях с целью изучить:**
     - `Микросервисную архитектуру`
     - `DDD`
+    - `Брокеры сообщений`
   
 ## Сервисы
 
-- KrakenD
-- KeyCloack
-- Каталог
-- Бронирование
+- KrakenD (Gateway)
+- KeyCloack (Авторизация и управление ролями)
+- Каталог и Бронирование
+
+## Технологии
+
+- `FastAPI` (Http фрэймворк и роутинг)
+- `Postgresql` (БД)
+- `Sqlalchemy` (ORM)
+- `Alembic` (Миграции БД Imperative mapping)
+- `FastStream` (Фрэймворк для работы с брокерами сообщений) Пока ещё нет работы с брокерами
+- `Pydantic` (Валидация входных данных)
+- `Dishka` (DI фрэймворк)
+- `FastAPI Error Map` ()
+- `Pytest` (Тестирование)
 
 ## Запуск
 
 ```bash
 cp .env.example .env
 
-docker compose up --build -d
+make up
+```
+
+## Тестирование
+
+```bash
+make test-booking
 ```

@@ -4,7 +4,8 @@ from dishka.integrations.fastapi import setup_dishka
 from dishka import make_async_container
 
 from booking_api.setup.config import Config, config
-from booking_api.setup.di.providers.providers import get_providers
+from booking_api.setup.di import get_providers
+
 
 def create_dishka(app: FastAPI):
     providers = get_providers()
