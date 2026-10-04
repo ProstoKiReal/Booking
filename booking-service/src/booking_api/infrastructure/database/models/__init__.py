@@ -1,10 +1,6 @@
 from sqlalchemy.orm import relationship
 
-from booking_api.infrastructure.database.models.base import (
-    BaseSaModel,
-    mapper_registry,
-    metadata,
-)
+from booking_api.infrastructure.database.models.base import mapper_registry
 from booking_api.infrastructure.database.models.category import (
     CategorySaModel,
     categories_table,
@@ -17,25 +13,25 @@ mapper_registry.map_imperatively(
     EventSaModel,
     events_table,
     properties={
-        "category": relationship(CategorySaModel, back_populates="event"),
-        "image": relationship(ImageSaModel, back_populates="event"),
+        "categories": relationship(CategorySaModel, back_populates="event"),
+        "images": relationship(ImageSaModel, back_populates="event"),
     },
 )
 mapper_registry.map_imperatively(
     CategorySaModel,
     categories_table,
-    properties={"event": relationship(EventSaModel, back_populates="category")},
+    properties={"event": relationship(EventSaModel, back_populates="categories")},
 )
 mapper_registry.map_imperatively(
     ImageSaModel,
     images_table,
-    properties={"event": relationship(EventSaModel, back_populates="image")},
+    properties={"event": relationship(EventSaModel, back_populates="images")},
 )
 
 
 __all__ = [
-    "BaseSaModel",
     "CategorySaModel",
     "EventSaModel",
     "ImageSaModel",
+    "mapper_registry",
 ]
