@@ -17,8 +17,8 @@ services:
       - BOOKING_APP_PORT=${BOOKING_APP_PORT}
       - BOOKING_APP_MODE=${BOOKING_APP_MODE}
     command: sh -c "alembic upgrade head  && uvicorn booking_api.main:create_app --factory --host ${BOOKING_APP_HOST} --port ${BOOKING_APP_PORT} --reload"
-    ports:
-      - "${BOOKING_APP_PORT}:${BOOKING_APP_PORT}"
+    expose:
+      - "${BOOKING_APP_PORT}"
     depends_on:
       booking-service-postgres:
         condition: service_healthy
@@ -61,9 +61,23 @@ services:
       - "8081:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      - ./keycloak/themes:/opt/keycloak/themes:ro
     depends_on:
       keycloak-postgres:
         condition: service_healthy
+    networks:
+      - app_net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8081}
+        VITE_GATEWAY_URL: ${VITE_GATEWAY_URL:-http://localhost:8080}
+    ports:
+      - "5173:80"
+    depends_on:
+      - keycloak
     networks:
       - app_net
 
@@ -72,10 +86,10 @@ services:
     container_name: keycloak-postgres
     environment:
       - POSTGRES_DB=${KC_POSTGRES_DB}
-      - POSTGRES_USER=${KC_POSTGRES_DB}
+      - POSTGRES_USER=${KC_POSTGRES_USER}
       - POSTGRES_PASSWORD=${KC_POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${KC_POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${KC_POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10

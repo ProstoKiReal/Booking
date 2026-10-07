@@ -1,6 +1,7 @@
 {
   "realm": "events-realm",
   "enabled": true,
+  "loginTheme": "booking",
   "sslRequired": "none",
   "registrationAllowed": false,
   "accessTokenLifespan": 3600,
@@ -25,7 +26,7 @@
       "attributes": {
         "access.token.claim": "true"
       },
-      "fullScopeAllowed": false,
+      "fullScopeAllowed": true,
       "defaultClientScopes": ["profile", "email", "roles"]
     }
   ],
