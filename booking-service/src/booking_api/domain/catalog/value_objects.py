@@ -1,16 +1,30 @@
 from dataclasses import dataclass
+from typing import Self
+from uuid import UUID, uuid4
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class EventID:
-    id: str | None = None
+    value: UUID
+
+    @classmethod
+    def new(cls) -> Self:
+        return cls(uuid4())
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class CategoryID:
-    id: str | None = None
+    value: UUID
+
+    @classmethod
+    def new(cls) -> Self:
+        return cls(uuid4())
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class ImageID:
-    id: str | None = None
+    value: UUID
+
+    @classmethod
+    def new(cls) -> Self:
+        return cls(uuid4())

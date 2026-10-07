@@ -1,0 +1,62 @@
+services:
+  booking-test-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: booking_test
+      POSTGRES_USER: booking_test
+      POSTGRES_PASSWORD: booking_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booking_test -d booking_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+
+  booking-test-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /booking-service
+    environment:
+      PYTHONPATH: src
+      BOOKING_DB_USER: booking_test
+      BOOKING_DB_PASSWORD: booking_test
+      BOOKING_DB_HOST: booking-test-db
+      BOOKING_DB_PORT: 5432
+      BOOKING_DB_NAME: booking_test
+      BOOKING_APP_HOST: 0.0.0.0
+      BOOKING_APP_PORT: 8000
+      BOOKING_APP_MODE: test
+    command:
+      - sh
+      - -c
+      - alembic upgrade head && uvicorn booking_api.main:create_app --factory --host 0.0.0.0 --port 8000
+    depends_on:
+      booking-test-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/docs')
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: "no"
+
+  booking-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    working_dir: /booking-service
+    environment:
+      PYTHONPATH: src
+      TEST_API_URL: http://booking-test-app:8000
+    command: ["pytest", "-v", "tests/"]
+    depends_on:
+      booking-test-app:
+        condition: service_healthy
+    restart: "no"

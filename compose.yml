@@ -1,7 +1,6 @@
 services:
   booking-service:
     &booking-service
-    env_file: booking-service/.env
     build: ./booking-service
     restart: always
     volumes:
@@ -9,17 +8,17 @@ services:
     working_dir: /booking-service
     environment:
       - PYTHONPATH=src
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - APP_HOST=${APP_HOST}
-      - APP_PORT=${APP_PORT}
-      - APP_MODE=${APP_MODE}
-    command: sh -c "alembic upgrade head  && uvicorn booking_api.main:create_app --factory --host ${APP_HOST} --port ${APP_PORT} --reload"
+      - BOOKING_DB_USER=${BOOKING_DB_USER}
+      - BOOKING_DB_PASSWORD=${BOOKING_DB_PASSWORD}
+      - BOOKING_DB_HOST=${BOOKING_DB_HOST}
+      - BOOKING_DB_PORT=${BOOKING_DB_PORT}
+      - BOOKING_DB_NAME=${BOOKING_DB_NAME}
+      - BOOKING_APP_HOST=${BOOKING_APP_HOST}
+      - BOOKING_APP_PORT=${BOOKING_APP_PORT}
+      - BOOKING_APP_MODE=${BOOKING_APP_MODE}
+    command: sh -c "alembic upgrade head  && uvicorn booking_api.main:create_app --factory --host ${BOOKING_APP_HOST} --port ${BOOKING_APP_PORT} --reload"
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - "${BOOKING_APP_PORT}:${BOOKING_APP_PORT}"
     depends_on:
       booking-service-postgres:
         condition: service_healthy
@@ -27,18 +26,17 @@ services:
       - app_net
 
   booking-service-postgres:
-    env_file: booking-service/.env
     image: postgres:17-alpine
     volumes:
       - booking-service-postgres-data:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${BOOKING_DB_PORT}:${BOOKING_DB_PORT}"
     environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${BOOKING_DB_NAME}
+      - POSTGRES_USER=${BOOKING_DB_USER}
+      - POSTGRES_PASSWORD=${BOOKING_DB_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${BOOKING_DB_USER} -d ${BOOKING_DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 5

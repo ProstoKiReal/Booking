@@ -4,7 +4,7 @@ from pydantic import PostgresDsn
 
 class DBConfig(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="DB_",
+        env_prefix="BOOKING_DB_",
         env_file_encoding="utf-8",
         extra="ignore",
     )

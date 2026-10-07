@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from booking_api.presentation.http.v1.v1_router import v1_router
+from booking_api.presentation.http.v1.routers.v1_router import v1_router
 
 http_router = APIRouter(prefix="/api")
 
