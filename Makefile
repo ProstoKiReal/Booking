@@ -1,4 +1,4 @@
-TEST_BOOKING_COMPOSE = docker compose -p booking-tests -f booking-service/compose.test.yml
+TEST_BOOKING_COMPOSE = docker compose -p booking-tests -f backend/booking-service/compose.test.yml
 
 .ONESHELL:
 test-booking:

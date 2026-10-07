@@ -1,10 +1,10 @@
 services:
   booking-service:
     &booking-service
-    build: ./booking-service
+    build: ./backend/booking-service
     restart: always
     volumes:
-      - ./booking-service:/booking-service
+      - ./backend/booking-service:/booking-service
     working_dir: /booking-service
     environment:
       - PYTHONPATH=src
