@@ -6,7 +6,6 @@ from booking_api.presentation.http.v1.routers.admin.category_router import route
 
 admin_router = APIRouter(
     prefix="/admin", 
-    tags=["Admin"],
 )
 
 routers = [

@@ -49,28 +49,28 @@ error_map = {
 
 router = ErrorAwareRouter(
     prefix="/categories",
-    tags=["Categories"],
+    tags=["Admin Categories"],
     route_class=DishkaErrorAwareRoute,
 )
 
 
-@router.get("/", response_model=GetListCategoryResponse)
-async def list_categories(
-    handler: FromDishka[ListCategoriesQueryHandler],
-    mapper: FromDishka[GetListCategoryMapper],
-) -> GetListCategoryResponse:
-    categories = await handler()
-    return mapper.to_response(categories)
+# @router.get("/", response_model=GetListCategoryResponse)
+# async def list_categories(
+#     handler: FromDishka[ListCategoriesQueryHandler],
+#     mapper: FromDishka[GetListCategoryMapper],
+# ) -> GetListCategoryResponse:
+#     categories = await handler()
+#     return mapper.to_response(categories)
 
 
-@router.get("/{category_id}", response_model=GetCategoryResponse, error_map=error_map)
-async def get_category(
-    category_id: UUID,
-    handler: FromDishka[GetCategoryQueryHandler],
-    mapper: FromDishka[GetCategoryMapper],
-) -> GetCategoryResponse:
-    category = await handler(category_id)
-    return mapper.to_response(category)
+# @router.get("/{category_id}", response_model=GetCategoryResponse, error_map=error_map)
+# async def get_category(
+#     category_id: UUID,
+#     handler: FromDishka[GetCategoryQueryHandler],
+#     mapper: FromDishka[GetCategoryMapper],
+# ) -> GetCategoryResponse:
+#     category = await handler(category_id)
+#     return mapper.to_response(category)
 
 
 @router.post(

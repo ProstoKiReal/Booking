@@ -9,7 +9,7 @@ from booking_api.application.handlers.queries.events_query_handlers import (
 
 router = APIRouter(
     prefix="/events", 
-    tags=["Events"], 
+    tags=["Public Events"], 
     route_class=DishkaRoute,
 )
 

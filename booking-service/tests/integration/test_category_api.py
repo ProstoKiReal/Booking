@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def clear_categories(test_client):
-    response = test_client.get("/api/v1/admin/categories/")
+    response = test_client.get("/api/v1/public/categories/")
     assert response.status_code == 200
 
     for category in response.json()["result"]:
@@ -20,14 +20,14 @@ class TestCreateCategory:
             "/api/v1/admin/categories/",
             json={"name": name},
         )
-        resp_data = resp .json()
+        resp_data = resp.json()
 
-        assert resp .status_code == 201
+        assert resp.status_code == 201
         assert resp_data["id"]
         assert resp_data["name"] == name.strip()
 
     def test_rejects_duplicate(self, test_client, category1):
-        resp= test_client.post(
+        resp = test_client.post(
             "/api/v1/admin/categories/",
             json={"name": category1["name"]},
         )
@@ -37,7 +37,7 @@ class TestCreateCategory:
 
     @pytest.mark.parametrize("name", ["", "   ", "\t", "\n", " \t\n "])
     def test_rejects_empty_or_whitespace_name(self, test_client, name):
-        resp= test_client.post(
+        resp = test_client.post(
             "/api/v1/admin/categories/",
             json={"name": name},
         )
@@ -46,7 +46,7 @@ class TestCreateCategory:
         assert resp.json()["error"] == "Category name cannot be empty."
 
     def test_rejects_name_shorter_than_two_characters(self, test_client):
-        resp= test_client.post(
+        resp = test_client.post(
             "/api/v1/admin/categories/",
             json={"name": "a"},
         )
@@ -55,7 +55,7 @@ class TestCreateCategory:
         assert "at least 2 characters" in resp.json()["error"]
 
     def test_rejects_name_longer_than_32_characters(self, test_client):
-        resp= test_client.post(
+        resp = test_client.post(
             "/api/v1/admin/categories/",
             json={"name": "x" * 33},
         )
@@ -65,7 +65,7 @@ class TestCreateCategory:
 
     @pytest.mark.parametrize("name", ["a1", "x" * 32])
     def test_accepts_name_length_boundaries(self, test_client, name):
-        resp= test_client.post(
+        resp = test_client.post(
             "/api/v1/admin/categories/",
             json={"name": name},
         )
@@ -77,7 +77,7 @@ class TestCreateCategory:
 class TestCategoryQueries:
     def test_get_category(self, test_client, category1):
         response = test_client.get(
-            f"/api/v1/admin/categories/{category1['id']}",
+            f"/api/v1/public/categories/{category1['id']}",
         )
 
         assert response.status_code == 200
@@ -85,7 +85,7 @@ class TestCategoryQueries:
 
     def test_get_category_returns_not_found(self, test_client):
         response = test_client.get(
-            "/api/v1/admin/categories/00000000-0000-0000-0000-000000000000",
+            "/api/v1/public/categories/00000000-0000-0000-0000-000000000000",
         )
 
         assert response.status_code == 404
@@ -98,7 +98,7 @@ class TestCategoryQueries:
             json={"name": name},
         ).json()
 
-        response = test_client.get("/api/v1/admin/categories/")
+        response = test_client.get("/api/v1/public/categories/")
 
         assert response.status_code == 200
         assert created in response.json()["result"]
@@ -179,7 +179,7 @@ class TestDeleteCategory:
 
         assert response.status_code == 204
         assert test_client.get(
-            f"/api/v1/admin/categories/{created['id']}",
+            f"/api/v1/public/categories/{created['id']}",
         ).status_code == 404
 
     def test_rejects_nonexistent_category(self, test_client):

@@ -10,7 +10,7 @@ from booking_api.application.handlers.commands.events_command_handlers import (
 
 router = APIRouter(
     prefix="/events", 
-    tags=["Events"],
+    tags=["Admin Events"],
     route_class=DishkaRoute,
 )
 
