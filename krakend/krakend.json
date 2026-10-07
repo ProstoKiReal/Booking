@@ -1,0 +1,202 @@
+{
+  "version": 3,
+  "name": "events-api-gateway",
+  "port": 8080,
+  "cache_ttl": "300s",
+  "timeout": "30s",
+  "extra_config": {
+    "github_com/devopsfaith/krakend-jose/validator": {
+      "alg": "RS256",
+      "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+      "cache": true,
+      "cache_duration": 900,
+      "disable_jwk_security": true,
+      "roles_key": "realm_access.roles",
+      "roles": ["admin", "seller"]
+    },
+    "github_com/devopsfaith/krakend-cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+      "allow_headers": ["Authorization", "Content-Type"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "12h",
+      "allow_credentials": false
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/api/v1/admin/events/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/events/",
+          "host": ["http://events-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/admin/events/{event_id}",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/events/{event_id}",
+          "host": ["http://events-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/admin/events/{event_id}",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/events/{event_id}",
+          "host": ["http://events-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/admin/categories/",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/categories/",
+          "host": ["http://categories-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/admin/categories/{category_id}",
+      "method": "PATCH",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/categories/{category_id}",
+          "host": ["http://categories-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/admin/categories/{category_id}",
+      "method": "DELETE",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/admin/categories/{category_id}",
+          "host": ["http://categories-service:80"],
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "github_com/devopsfaith/krakend-jose/validator": {
+          "alg": "RS256",
+          "jwk-url": "http://keycloak:8080/realms/events-realm/protocol/openid-connect/certs",
+          "cache": true,
+          "roles_key": "realm_access.roles",
+          "roles": ["admin", "seller"]
+        }
+      }
+    },
+    {
+      "endpoint": "/api/v1/public/events/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/public/events/",
+          "host": ["http://events-service:80"],
+          "encoding": "no-op"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/public/events/{event_id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/public/events/{event_id}",
+          "host": ["http://events-service:80"],
+          "encoding": "no-op"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/public/categories/",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/public/categories/",
+          "host": ["http://categories-service:80"],
+          "encoding": "no-op"
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/v1/public/categories/{category_id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "url_pattern": "/api/v1/public/categories/{category_id}",
+          "host": ["http://categories-service:80"],
+          "encoding": "no-op"
+        }
+      ]
+    }
+  ]
+}

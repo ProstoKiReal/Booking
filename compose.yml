@@ -44,9 +44,65 @@ services:
       - app_net
     restart: always
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8
+    container_name: keycloak
+    command: start-dev --import-realm
+    environment:
+      - KC_DB=${KC_DB}
+      - KC_DB_URL=${KC_DB_URL}
+      - KC_DB_USERNAME=${KC_DB_USERNAME}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
+      - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    networks:
+      - app_net
+
+  keycloak-postgres:
+    image: postgres:17-alpine
+    container_name: keycloak-postgres
+    environment:
+      - POSTGRES_DB=${KC_POSTGRES_DB}
+      - POSTGRES_USER=${KC_POSTGRES_DB}
+      - POSTGRES_PASSWORD=${KC_POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KC_POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - keycloak-postgres-data:/var/lib/postgresql/data
+    networks:
+      - app_net
+
+  krakend:
+    image: devopsfaith/krakend:2.7
+    container_name: krakend
+    command: ["run", "-c", "/etc/krakend/krakend.json", "-d"]
+    volumes:
+      - ./krakend/krakend.json:/etc/krakend/krakend.json:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak
+      - booking-service
+    networks:
+      - app_net
+
+
 networks:
   app_net:
     driver: bridge
 
 volumes:
   booking-service-postgres-data:
+  keycloak-postgres-data:

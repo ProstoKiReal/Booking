@@ -1,0 +1,67 @@
+{
+  "realm": "events-realm",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "accessTokenLifespan": 3600,
+  "roles": {
+    "realm": [
+      { "name": "admin",    "description": "Administrator" },
+      { "name": "seller",   "description": "Seller" },
+      { "name": "customer", "description": "Customer" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "events-api",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.claim": "true"
+      },
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["profile", "email", "roles"]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "email": "admin@example.com",
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "requiredActions": [],
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "seller-user",
+      "enabled": true,
+      "email": "seller@example.com",
+      "emailVerified": true,
+      "firstName": "Seller",
+      "lastName": "User",
+      "requiredActions": [],
+      "credentials": [{ "type": "password", "value": "seller", "temporary": false }],
+      "realmRoles": ["seller"]
+    },
+    {
+      "username": "customer-user",
+      "enabled": true,
+      "email": "customer@example.com",
+      "emailVerified": true,
+      "firstName": "Customer",
+      "lastName": "User",
+      "requiredActions": [],
+      "credentials": [{ "type": "password", "value": "customer", "temporary": false }],
+      "realmRoles": ["customer"]
+    }
+  ]
+}
