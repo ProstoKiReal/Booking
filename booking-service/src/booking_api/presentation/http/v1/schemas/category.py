@@ -3,13 +3,33 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class CategoryBase(BaseModel):
+class CategoryName(BaseModel):
     name: str
 
 
-class CategoryResponse(CategoryBase):
+class CategoryID(BaseModel):
     id: UUID
 
 
-class CategoryRequest(CategoryBase):
+class CreateCategoryRequest(CategoryName):
+    pass 
+
+
+class CreateCategoryResponse(CategoryID, CategoryName):
     pass
+
+
+class UpdateCategoryRequest(CategoryName):
+    pass 
+
+
+class UpdateCategoryResponse(CategoryID, CategoryName):
+    pass
+
+
+class GetCategoryResponse(CategoryID, CategoryName):
+    pass 
+
+
+class GetListCategoryResponse(BaseModel):
+    result: list[GetCategoryResponse]

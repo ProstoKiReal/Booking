@@ -1,9 +1,9 @@
 from dishka import Provider, Scope, provide
 
-from booking_api.presentation.http.v1.mappers.category import CategoryMapper
+from booking_api.application.mappers import CategoryMapper
 
 
-class MappersProvider(Provider):
+class ApplicationMappersProvider(Provider):
     scope = Scope.APP
 
     @provide

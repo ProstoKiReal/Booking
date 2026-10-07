@@ -5,6 +5,7 @@ from booking_api.domain.catalog.errors import (
     CategoryNameEmptyError,
     CategoryNameTooLongError,
     CategoryNameTooShortError,
+    CategoryOldNameEquivalentNewNameError
 )
 from booking_api.domain.catalog.value_objects import EventID, CategoryID, ImageID
 
@@ -35,6 +36,10 @@ class Category:
     def is_unique(self, already_exists: bool) -> None:
         if already_exists:
             raise CategoryAlreadyExistsError(self.name)
+
+    def rename(self, current_cat_name: str, updated_cat_name: str) -> None:
+        if current_cat_name == updated_cat_name:
+            raise CategoryOldNameEquivalentNewNameError(current_cat_name, updated_cat_name)
 
 
 @dataclass
