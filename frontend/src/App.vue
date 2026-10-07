@@ -7,11 +7,17 @@ import { useAuth } from './composables/useAuth'
 const CategoryAdmin = defineAsyncComponent(
   () => import('./components/CategoryAdmin.vue'),
 )
+const ProfilePage = defineAsyncComponent(
+  () => import('./components/ProfilePage.vue'),
+)
 
 const {
   isReady,
   isAuthenticated,
   userName,
+  profile,
+  openPersonalInfo,
+  openPasswordSettings,
   canManageCategories,
   errorMessage,
   initialize,
@@ -19,7 +25,7 @@ const {
   signOut,
   authorizedFetch,
 } = useAuth()
-const isAdminView = ref(false)
+const currentView = ref<'home' | 'profile' | 'admin'>('home')
 
 onMounted(initialize)
 </script>
@@ -31,21 +37,30 @@ onMounted(initialize)
       :is-authenticated="isAuthenticated"
       :user-name="userName"
       :can-manage-categories="canManageCategories"
-      :show-admin-view="isAdminView"
+      :show-admin-view="currentView === 'admin'"
+      :show-profile="currentView === 'profile'"
       @sign-in="signIn"
       @sign-out="signOut"
-      @open-admin="isAdminView = true"
-      @go-home="isAdminView = false"
+      @open-admin="currentView = 'admin'"
+      @open-profile="currentView = 'profile'"
+      @go-home="currentView = 'home'"
     />
 
     <Message v-if="errorMessage" severity="error" :closable="false" role="alert">
       {{ errorMessage }}
     </Message>
 
-    <main v-if="isAdminView && canManageCategories" class="page-content">
+    <main v-if="currentView === 'admin' && canManageCategories" class="page-content">
       <CategoryAdmin
         :authorized-fetch="authorizedFetch"
-        @back="isAdminView = false"
+        @back="currentView = 'home'"
+      />
+    </main>
+    <main v-else-if="currentView === 'profile' && isAuthenticated" class="page-content">
+      <ProfilePage
+        :profile="profile"
+        :open-personal-info="openPersonalInfo"
+        :open-password-settings="openPasswordSettings"
       />
     </main>
   </div>

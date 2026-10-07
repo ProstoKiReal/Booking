@@ -1,6 +1,15 @@
 import { computed, ref } from 'vue'
 import Keycloak from 'keycloak-js'
 
+export interface UserProfile {
+  username: string
+  name: string
+  firstName: string
+  lastName: string
+  email: string
+  roles: string[]
+}
+
 const keycloak = new Keycloak({
   url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8081',
   realm: 'events-realm',
@@ -11,30 +20,40 @@ export function useAuth() {
   const isReady = ref(false)
   const isAuthenticated = ref(false)
   const errorMessage = ref('')
-  const realmRoles = ref<string[]>([])
+  const profileClaims = ref<UserProfile | null>(null)
 
   const userName = computed(
-    () =>
-      keycloak.tokenParsed?.preferred_username ??
-      keycloak.tokenParsed?.name ??
-      'Профиль',
+    () => profileClaims.value?.username || profileClaims.value?.name || 'Профиль',
   )
 
   const canManageCategories = computed(() =>
-    realmRoles.value.some((role) => role === 'admin' || role === 'seller'),
+    (profileClaims.value?.roles ?? []).some(
+      (role) => role === 'admin' || role === 'seller',
+    ),
   )
 
   function syncRealmRoles() {
     const claims: unknown = keycloak.tokenParsed
-    if (!isRecord(claims) || !isRecord(claims.realm_access)) {
-      realmRoles.value = []
+    if (!isRecord(claims)) {
+      profileClaims.value = null
       return
     }
 
-    const roles = claims.realm_access.roles
-    realmRoles.value = Array.isArray(roles)
-      ? roles.filter((role): role is string => typeof role === 'string')
-      : []
+    const realmAccess = isRecord(claims.realm_access)
+      ? claims.realm_access
+      : null
+    const roles = realmAccess?.roles
+
+    profileClaims.value = {
+      username: stringClaim(claims.preferred_username),
+      name: stringClaim(claims.name),
+      firstName: stringClaim(claims.given_name),
+      lastName: stringClaim(claims.family_name),
+      email: stringClaim(claims.email),
+      roles: Array.isArray(roles)
+        ? roles.filter((role): role is string => typeof role === 'string')
+        : [],
+    }
   }
 
   async function initialize() {
@@ -46,7 +65,7 @@ export function useAuth() {
       syncRealmRoles()
     } catch {
       errorMessage.value =
-        'Не удалось подключиться к Keycloak. Проверьте, что сервис запущен.'
+        'Не удалось подключиться к сервису авторизации. Попробуйте позже.'
     } finally {
       isReady.value = true
     }
@@ -67,6 +86,22 @@ export function useAuth() {
       await keycloak.logout({ redirectUri: window.location.origin })
     } catch {
       errorMessage.value = 'Не удалось завершить сеанс. Попробуйте ещё раз.'
+    }
+  }
+
+  function openAccountPage(section: 'personal-info' | 'password') {
+    errorMessage.value = ''
+    try {
+      const accountUrl = new URL(keycloak.createAccountUrl())
+      const accountPath = accountUrl.pathname.replace(/\/+$/, '')
+      accountUrl.pathname =
+        section === 'personal-info'
+          ? `${accountPath}/`
+          : `${accountPath}/account-security/signing-in`
+      accountUrl.searchParams.set('kc_locale', 'ru')
+      window.location.assign(accountUrl.toString())
+    } catch {
+      errorMessage.value = 'Не удалось открыть настройки учётной записи.'
     }
   }
 
@@ -94,6 +129,9 @@ export function useAuth() {
     isReady,
     isAuthenticated,
     userName,
+    profile: computed(() => profileClaims.value),
+    openPersonalInfo: () => openAccountPage('personal-info'),
+    openPasswordSettings: () => openAccountPage('password'),
     canManageCategories,
     errorMessage,
     initialize,
@@ -105,4 +143,8 @@ export function useAuth() {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
+}
+
+function stringClaim(value: unknown): string {
+  return typeof value === 'string' ? value : ''
 }

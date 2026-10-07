@@ -8,12 +8,14 @@ defineProps<{
   userName: string
   canManageCategories: boolean
   showAdminView: boolean
+  showProfile: boolean
 }>()
 
 const emit = defineEmits<{
   signIn: []
   signOut: []
   openAdmin: []
+  openProfile: []
   goHome: []
 }>()
 
@@ -35,6 +37,13 @@ function toggleAdminView(showAdminView: boolean) {
       <div class="account">
         <template v-if="isAuthenticated">
           <span>{{ userName }}</span>
+          <Button
+            label="Профиль"
+            severity="secondary"
+            text
+            :disabled="showProfile"
+            @click="$emit('openProfile')"
+          />
           <Button
             v-if="canManageCategories"
             :label="showAdminView ? 'На главную' : 'Админка'"
