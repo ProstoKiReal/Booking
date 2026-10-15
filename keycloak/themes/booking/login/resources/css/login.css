@@ -1,36 +1,38 @@
 :root {
-  --booking-primary: #10b981;
-  --booking-primary-hover: #059669;
-  --booking-text: #0f172a;
-  --booking-muted: #475569;
-  --booking-border: #e2e8f0;
-  --booking-background: #f8fafc;
+  --booking-primary: #3159be;
+  --booking-primary-hover: #2648a7;
+  --booking-text: #20283a;
+  --booking-muted: #5d6678;
+  --booking-border: #e1e5ef;
+  --booking-background: #f8f9fc;
 }
 
 body,
 .pf-v5-c-login {
-  background: var(--booking-background);
+  background:
+    radial-gradient(70rem circle at 10% 0%, rgb(49 89 190 / 9%), transparent 55%),
+    var(--booking-background);
   color: var(--booking-text);
-  font-family: Arial, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .pf-v5-c-login__main {
   border: 1px solid var(--booking-border);
-  border-radius: 12px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 4px 12px rgb(15 23 42 / 5%);
+  box-shadow: 0 16px 48px rgb(32 40 58 / 8%);
 }
 
 #kc-header-wrapper,
 #kc-page-title,
 .pf-v5-c-title {
   color: var(--booking-text);
-  font-family: Arial, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 #kc-header-wrapper {
-  color: var(--booking-primary);
-  font-size: 1.1rem;
+  color: var(--booking-text);
+  font-size: 1.125rem;
   font-weight: 600;
 }
 
@@ -42,28 +44,47 @@ body,
 .pf-v5-c-form-control,
 input[type="text"],
 input[type="password"] {
-  min-height: 40px;
+  min-height: 44px;
   border-color: var(--booking-border);
-  border-radius: 7px;
+  border-radius: 8px;
   color: var(--booking-text);
   background: #fff;
+}
+
+.pf-v5-c-input-group {
+  overflow: hidden;
+  border: 1px solid var(--booking-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.pf-v5-c-input-group .pf-v5-c-form-control,
+.pf-v5-c-input-group input[type="password"] {
+  border: 0;
+  box-shadow: none;
+}
+
+.pf-v5-c-input-group:focus-within {
+  border-color: var(--booking-primary);
+  box-shadow: 0 0 0 3px rgb(49 89 190 / 14%);
 }
 
 .pf-v5-c-form-control:focus,
 input[type="text"]:focus,
 input[type="password"]:focus {
   border-color: var(--booking-primary);
-  box-shadow: 0 0 0 1px var(--booking-primary);
+  box-shadow: 0 0 0 3px rgb(49 89 190 / 14%);
 }
 
 .pf-v5-c-button.pf-m-primary,
 input[type="submit"] {
-  min-height: 40px;
+  min-height: 44px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   color: #fff;
   background: var(--booking-primary);
   font-weight: 600;
+  transition: background-color 120ms ease;
 }
 
 .pf-v5-c-button.pf-m-primary:hover,
@@ -86,6 +107,6 @@ label {
 
 @media (max-width: 480px) {
   .pf-v5-c-login__main {
-    border-radius: 10px;
+    border-radius: 12px;
   }
 }

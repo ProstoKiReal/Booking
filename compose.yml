@@ -17,8 +17,8 @@ services:
       - BOOKING_APP_PORT=${BOOKING_APP_PORT}
       - BOOKING_APP_MODE=${BOOKING_APP_MODE}
     command: sh -c "alembic upgrade head  && uvicorn booking_api.main:create_app --factory --host ${BOOKING_APP_HOST} --port ${BOOKING_APP_PORT} --reload"
-    expose:
-      - "${BOOKING_APP_PORT}"
+    ports:
+      - "${BOOKING_APP_PORT}:${BOOKING_APP_PORT}"
     depends_on:
       booking-service-postgres:
         condition: service_healthy
@@ -45,7 +45,8 @@ services:
     restart: always
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.8
+    image: booking-keycloak:26.8
+    build: ./keycloak
     container_name: keycloak
     command: start-dev --import-realm
     environment:
@@ -58,8 +59,6 @@ services:
       - KC_HOSTNAME_STRICT=${KC_HOSTNAME_STRICT}
       - KC_HTTP_ENABLED=${KC_HTTP_ENABLED}
       - KC_PROXY_HEADERS=xforwarded
-    expose:
-      - "8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
       - ./keycloak/themes:/opt/keycloak/themes:ro

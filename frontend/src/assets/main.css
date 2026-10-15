@@ -1,148 +1,74 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Geist Variable", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  font-family: "Geist Variable", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --background: oklch(0.99 0.003 90);
+  --foreground: oklch(0.2 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 260);
+  --primary: oklch(0.48 0.16 257);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.01 250);
+  --secondary-foreground: oklch(0.28 0.03 260);
+  --muted: oklch(0.96 0.008 250);
+  --muted-foreground: oklch(0.53 0.025 260);
+  --accent: oklch(0.94 0.025 250);
+  --accent-foreground: oklch(0.25 0.04 260);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.91 0.012 255);
+  --input: oklch(0.91 0.012 255);
+  --ring: oklch(0.58 0.14 257);
+  --radius: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
+  min-width: 320px;
+  min-height: 100vh;
   margin: 0;
-  color: var(--p-text-color);
-  background: var(--p-surface-50);
-  font-family: Arial, "Segoe UI", sans-serif;
+  background: var(--background);
+  color: var(--foreground);
 }
 
-.page-shell {
-  width: min(100% - 2rem, 60rem);
-  margin: 1rem auto;
-}
-
-.account,
-.category-form,
-.category-actions,
-.dialog-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.page-content {
-  padding-top: 1.5rem;
-}
-
-.page-heading {
-  margin-bottom: 1rem;
-}
-
-.category-form .p-inputtext {
-  max-width: 24rem;
-  flex: 1;
-}
-
-.category-table-card {
-  margin-top: 1rem;
-}
-
-.dialog-form {
-  display: grid;
-  gap: 1rem;
-}
-
-.dialog-actions {
-  justify-content: flex-end;
-}
-
-.profile-page {
-  display: grid;
-  gap: 1rem;
-}
-
-.profile-page .page-heading {
-  margin-bottom: 0;
-}
-
-.profile-identity {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.profile-identity-text {
-  flex: 1;
-}
-
-.profile-identity-text h2,
-.profile-identity-text p,
-.profile-access h3 {
-  margin: 0;
-}
-
-.profile-identity-text p {
-  margin-top: 0.25rem;
-  color: var(--p-text-muted-color);
-}
-
-.profile-role-tags,
-.profile-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.profile-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
-  align-items: start;
-  gap: 1rem;
-}
-
-.profile-form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem 1rem;
-  margin: 0.5rem 0 1.5rem;
-}
-
-.profile-actions {
-  margin-top: 1rem;
-}
-
-.profile-details {
-  display: grid;
-  gap: 1rem;
-  margin: 0;
-}
-
-.profile-details > div {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.profile-details dt {
-  color: var(--p-text-muted-color);
-  font-size: 0.875rem;
-}
-
-.profile-details dd {
-  margin: 0;
-}
-
-.profile-id {
-  overflow-wrap: anywhere;
-  font-family: monospace;
-  font-size: 0.875rem;
-}
-
-.profile-access {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
-
-@media (max-width: 40rem) {
-  .account,
-  .category-form,
-  .category-actions {
-    flex-wrap: wrap;
-  }
-
-  .profile-grid,
-  .profile-form {
-    grid-template-columns: minmax(0, 1fr);
-  }
+button,
+input {
+  font: inherit;
 }
