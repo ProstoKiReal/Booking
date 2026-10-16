@@ -1,42 +1,42 @@
 services:
-  booking-service:
-    &booking-service
-    build: ./backend/booking-service
+  catalog-service:
+    &catalog-service
+    build: ./backend/catalog-service
     restart: always
     volumes:
-      - ./backend/booking-service:/backend/booking-service
-    working_dir: /booking-service
+      - ./backend/catalog-service:/catalog-service
+    working_dir: /catalog-service
     environment:
       - PYTHONPATH=src
-      - BOOKING_DB_USER=${BOOKING_DB_USER}
-      - BOOKING_DB_PASSWORD=${BOOKING_DB_PASSWORD}
-      - BOOKING_DB_HOST=${BOOKING_DB_HOST}
-      - BOOKING_DB_PORT=${BOOKING_DB_PORT}
-      - BOOKING_DB_NAME=${BOOKING_DB_NAME}
-      - BOOKING_APP_HOST=${BOOKING_APP_HOST}
-      - BOOKING_APP_PORT=${BOOKING_APP_PORT}
-      - BOOKING_APP_MODE=${BOOKING_APP_MODE}
-    command: sh -c "alembic upgrade head  && uvicorn booking_api.main:create_app --factory --host ${BOOKING_APP_HOST} --port ${BOOKING_APP_PORT} --reload"
+      - CAT_DB_USER=${CAT_DB_USER}
+      - CAT_DB_PASSWORD=${CAT_DB_PASSWORD}
+      - CAT_DB_HOST=${CAT_DB_HOST}
+      - CAT_DB_PORT=${CAT_DB_PORT}
+      - CAT_DB_NAME=${CAT_DB_NAME}
+      - CAT_APP_HOST=${CAT_APP_HOST}
+      - CAT_APP_PORT=${CAT_APP_PORT}
+      - CAT_APP_MODE=${CAT_APP_MODE}
+    command: sh -c "alembic upgrade head  && uvicorn catalog_api.main:create_app --factory --host ${CAT_APP_HOST} --port ${CAT_APP_PORT} --reload"
     ports:
-      - "${BOOKING_APP_PORT}:${BOOKING_APP_PORT}"
+      - "${CAT_APP_PORT}:${CAT_APP_PORT}"
     depends_on:
-      booking-service-postgres:
+      catalog-service-postgres:
         condition: service_healthy
     networks:
       - app_net
 
-  booking-service-postgres:
+  catalog-service-postgres:
     image: postgres:17-alpine
     volumes:
-      - booking-service-postgres-data:/var/lib/postgresql/data
+      - catalog-service-postgres-data:/var/lib/postgresql/data
     ports:
-      - "${BOOKING_DB_PORT}:${BOOKING_DB_PORT}"
+      - "${CAT_DB_HOST_PORT:-5433}:${CAT_DB_PORT}"
     environment:
-      - POSTGRES_DB=${BOOKING_DB_NAME}
-      - POSTGRES_USER=${BOOKING_DB_USER}
-      - POSTGRES_PASSWORD=${BOOKING_DB_PASSWORD}
+      - POSTGRES_DB=${CAT_DB_NAME}
+      - POSTGRES_USER=${CAT_DB_USER}
+      - POSTGRES_PASSWORD=${CAT_DB_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${BOOKING_DB_USER} -d ${BOOKING_DB_NAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${CAT_DB_USER} -d ${CAT_DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -119,7 +119,7 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak
-      - booking-service
+      - catalog-service
     networks:
       - app_net
 
@@ -129,5 +129,5 @@ networks:
     driver: bridge
 
 volumes:
-  booking-service-postgres-data:
+  catalog-service-postgres-data:
   keycloak-postgres-data:

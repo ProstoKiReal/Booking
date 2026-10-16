@@ -1,0 +1,62 @@
+services:
+  catalog-test-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: catalog_test
+      POSTGRES_USER: catalog_test
+      POSTGRES_PASSWORD: catalog_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalog_test -d catalog_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    restart: "no"
+
+  catalog-test-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /catalog-service
+    environment:
+      PYTHONPATH: src
+      CAT_DB_USER: catalog_test
+      CAT_DB_PASSWORD: catalog_test
+      CAT_DB_HOST: catalog-test-db
+      CAT_DB_PORT: 5432
+      CAT_DB_NAME: catalog_test
+      CAT_APP_HOST: 0.0.0.0
+      CAT_APP_PORT: 8000
+      CAT_APP_MODE: test
+    command:
+      - sh
+      - -c
+      - alembic upgrade head && uvicorn catalog_api.main:create_app --factory --host 0.0.0.0 --port 8000
+    depends_on:
+      catalog-test-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/docs')
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: "no"
+
+  catalog-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    working_dir: /catalog-service
+    environment:
+      PYTHONPATH: src
+      TEST_API_URL: http://catalog-test-app:8000
+    command: ["pytest", "-v", "tests/"]
+    depends_on:
+      catalog-test-app:
+        condition: service_healthy
+    restart: "no"
