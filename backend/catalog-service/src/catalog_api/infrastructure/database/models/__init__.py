@@ -22,7 +22,10 @@ mapper_registry.map_imperatively(
             GalleryImageSaModel,
             back_populates="event",
             cascade="all, delete-orphan",
-            order_by=gallery_images_table.c.order,
+            order_by=(
+                gallery_images_table.c.order,
+                gallery_images_table.c.image_id,
+            ),
         ),
     },
 )
