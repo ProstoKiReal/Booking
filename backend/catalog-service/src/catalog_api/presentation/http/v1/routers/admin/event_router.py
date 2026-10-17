@@ -1,10 +1,16 @@
 from fastapi import APIRouter
-from dishka.integrations.fastapi import FromDishka, DishkaRoute
+from dishka.integrations.fastapi import FromDishka
 
+from catalog_api.presentation.http.http_route import DishkaRoute
 from catalog_api.application.handlers.commands.events_command_handlers import (
     CreateEventCommandHandler,
     UpdateEventCommandHandler,
     DeleteEventCommandHandler,
+)
+from catalog_api.presentation.http.v1.schemas.event import (
+    CreateEventRequest,
+    CreateEventResponse,
+    UpdateEventRequest,
 )
 
 
@@ -16,7 +22,10 @@ router = APIRouter(
 
 
 @router.post("/")
-async def create_event(handler: FromDishka[CreateEventCommandHandler]):
+async def create_event(
+    event_data: CreateEventRequest,
+    handler: FromDishka[CreateEventCommandHandler],
+):
     return await handler()
 
 
