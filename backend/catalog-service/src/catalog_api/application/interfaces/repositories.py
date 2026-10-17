@@ -1,8 +1,6 @@
 from abc import abstractmethod
 from typing import Protocol
 
-from fastapi import UploadFile
-
 from catalog_api.domain.catalog.entities import Category, Event, GalleryImage, Image
 from catalog_api.domain.catalog.value_objects import EventID, CategoryID, ImageID
 
@@ -97,10 +95,10 @@ class GalleryImageRepo(Protocol):
 
 class ImageStorageRepo(Protocol):
     @abstractmethod
-    async def save(self, image_data: UploadFile) -> str: ...
+    async def save(self, image_data: bytes) -> str: ...
 
     @abstractmethod
-    async def save_batch(self, images_data: list[UploadFile]) -> list[str]: ...
+    async def save_batch(self, images_data: list[bytes]) -> list[str]: ...
 
     @abstractmethod
     async def delete(self, image_url: str) -> None: ...

@@ -2,8 +2,14 @@ import asyncio
 from uuid import uuid4
 
 from aiobotocore.client import AioBaseClient
+from botocore.exceptions import BotoCoreError, ClientError
 
 from catalog_api.application.interfaces.repositories import ImageStorageRepo
+from catalog_api.infrastructure.errors import (
+    ImageStorageBatchError,
+    ImageStorageError,
+    InvalidImageStorageURLError,
+)
 
 
 _MAX_CONCURRENT = 5
@@ -22,39 +28,64 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
 
     async def save(self, object_data: bytes) -> str:
         key = uuid4().hex
-        await self.client.put_object(
-            Bucket=self.bucket,
-            Key=key,
-            Body=object_data,
-        )
+        try:
+            await self.client.put_object(
+                Bucket=self.bucket,
+                Key=key,
+                Body=object_data,
+            )
+        except (BotoCoreError, ClientError) as error:
+            raise ImageStorageError("Failed to upload image to S3.") from error
         return self._url_for(key)
 
     async def save_batch(self, images_data: list[bytes]) -> list[str]:
         sem = asyncio.Semaphore(_MAX_CONCURRENT)
-        async with asyncio.TaskGroup() as task_group:
-            tasks = [
-                task_group.create_task(self._save_with_sem(sem, image_data))
-                for image_data in images_data
-            ]
+        try:
+            async with asyncio.TaskGroup() as task_group:
+                tasks = [
+                    task_group.create_task(self._save_with_sem(sem, image_data))
+                    for image_data in images_data
+                ]
+        except* ImageStorageError as errors:
+            raise ImageStorageBatchError("Failed to upload image batch to S3.") from errors
         return [task.result() for task in tasks]
 
     async def delete(self, image_url: str) -> None:
-        await self.client.delete_object(
-            Bucket=self.bucket,
-            Key=self._key_from_url(image_url),
-        )
+        key = self._key_from_url(image_url)
+        try:
+            await self.client.delete_object(Bucket=self.bucket, Key=key)
+        except (BotoCoreError, ClientError) as error:
+            raise ImageStorageError("Failed to delete image from S3.") from error
+
+    async def delete_batch(self, image_urls: list[str]) -> None:
+        sem = asyncio.Semaphore(_MAX_CONCURRENT)
+        try:
+            async with asyncio.TaskGroup() as task_group:
+                for image_url in image_urls:
+                    task_group.create_task(self._delete_with_sem(sem, image_url))
+        except* ImageStorageError as errors:
+            raise ImageStorageBatchError("Failed to delete image batch from S3.") from errors
 
     async def get(self, image_url: str) -> bytes:
-        response = await self.client.get_object(
-            Bucket=self.bucket,
-            Key=self._key_from_url(image_url),
-        )
-        async with response["Body"] as body:
-            return await body.read()
+        key = self._key_from_url(image_url)
+        try:
+            response = await self.client.get_object(Bucket=self.bucket, Key=key)
+            async with response["Body"] as body:
+                return await body.read()
+        except (BotoCoreError, ClientError) as error:
+            raise ImageStorageError("Failed to download image from S3.") from error
 
     async def _save_with_sem(self, sem: asyncio.Semaphore, image_data: bytes) -> str:
         async with sem:
             return await self.save(image_data)
+
+    async def _delete_with_sem(
+        self,
+        sem: asyncio.Semaphore,
+        image_url: str,
+    ) -> None:
+        async with sem:
+            await self.delete(image_url)
 
     def _url_for(self, key: str) -> str:
         return f"{self.public_endpoint}/{self.bucket}/{key}"
@@ -62,9 +93,13 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
     def _key_from_url(self, image_url: str) -> str:
         prefix = f"{self.public_endpoint}/{self.bucket}/"
         if not image_url.startswith(prefix):
-            raise ValueError("Image URL does not belong to this S3 bucket.")
+            raise InvalidImageStorageURLError(
+                "Image URL does not belong to this S3 bucket."
+            )
 
         key = image_url.removeprefix(prefix)
         if not key or "/" in key:
-            raise ValueError("Image URL must identify one object in this S3 bucket.")
+            raise InvalidImageStorageURLError(
+                "Image URL must identify one object in this S3 bucket."
+            )
         return key
