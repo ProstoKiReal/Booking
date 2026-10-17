@@ -34,3 +34,13 @@ class CategoryNotFoundError(BaseCatalogDomainError):
 class CategoryOldNameEquivalentNewNameError(BaseCatalogDomainError):
     def __init__(self, old: str, new) -> None:
         super().__init__(f"Category  old name '{old}' equivalent new name '{new}'.")
+
+
+class ImageGalleryInvalidOrderError(BaseCatalogDomainError):
+    def __init__(self, order: int) -> None:
+        super().__init__(f"Image gallery order '{order}' is invalid. Must be in range 0-12.")
+
+
+class ImageGalleryInvalidCountError(BaseCatalogDomainError):
+    def __init__(self, count: int) -> None:
+        super().__init__(f"Image gallery count '{count}' is invalid. Must be in range 0-12.")

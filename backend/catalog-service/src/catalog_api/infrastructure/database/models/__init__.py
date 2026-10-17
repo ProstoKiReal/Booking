@@ -6,6 +6,10 @@ from catalog_api.infrastructure.database.models.category import (
     categories_table,
 )
 from catalog_api.infrastructure.database.models.event import EventSaModel, events_table
+from catalog_api.infrastructure.database.models.gallery_image import (
+    GalleryImageSaModel,
+    gallery_images_table,
+)
 from catalog_api.infrastructure.database.models.image import ImageSaModel, images_table
 
 
@@ -14,7 +18,12 @@ mapper_registry.map_imperatively(
     events_table,
     properties={
         "category": relationship(CategorySaModel, back_populates="events"),
-        "images": relationship(ImageSaModel, back_populates="event"),
+        "gallery_images": relationship(
+            GalleryImageSaModel,
+            back_populates="event",
+            cascade="all, delete-orphan",
+            order_by=gallery_images_table.c.order,
+        ),
     },
 )
 mapper_registry.map_imperatively(
@@ -25,13 +34,28 @@ mapper_registry.map_imperatively(
 mapper_registry.map_imperatively(
     ImageSaModel,
     images_table,
-    properties={"event": relationship(EventSaModel, back_populates="images")},
+    properties={
+        "gallery_images": relationship(
+            GalleryImageSaModel,
+            back_populates="image",
+            cascade="all, delete-orphan",
+        )
+    },
+)
+mapper_registry.map_imperatively(
+    GalleryImageSaModel,
+    gallery_images_table,
+    properties={
+        "event": relationship(EventSaModel, back_populates="gallery_images"),
+        "image": relationship(ImageSaModel, back_populates="gallery_images"),
+    },
 )
 
 
 __all__ = [
     "CategorySaModel",
     "EventSaModel",
+    "GalleryImageSaModel",
     "ImageSaModel",
     "mapper_registry",
 ]
