@@ -33,7 +33,7 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
         sem = asyncio.Semaphore(_MAX_CONCURRENT)
         async with asyncio.TaskGroup() as task_group:
             tasks = [
-                task_group.create_task(self._save_with_limit(sem, image_data))
+                task_group.create_task(self._save_with_sem(sem, image_data))
                 for image_data in images_data
             ]
         return [task.result() for task in tasks]
@@ -52,7 +52,7 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
         async with response["Body"] as body:
             return await body.read()
 
-    async def _save_with_limit(self, sem: asyncio.Semaphore, image_data: bytes) -> str:
+    async def _save_with_sem(self, sem: asyncio.Semaphore, image_data: bytes) -> str:
         async with sem:
             return await self.save(image_data)
 
