@@ -63,7 +63,7 @@ make up
 ## Тестирование
 
 ```bash
-make test-booking
+make test-catalog
 ```
 
 ## Ресурсы

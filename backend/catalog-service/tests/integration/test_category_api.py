@@ -1,6 +1,16 @@
 import pytest
 
 
+@pytest.fixture
+def category1(test_client):
+    response = test_client.post(
+        "/api/v1/admin/categories/",
+        json={"name": "test-category"},
+    )
+    assert response.status_code == 201
+    return response.json()
+
+
 @pytest.fixture(autouse=True)
 def clear_categories(test_client):
     response = test_client.get("/api/v1/public/categories/")
