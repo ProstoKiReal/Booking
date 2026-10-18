@@ -16,6 +16,15 @@ function App() {
   const auth = useAuth()
   const [currentView, setCurrentView] = useState<CurrentView>('home')
 
+  if (!auth.isReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center gap-2 text-sm text-muted-foreground">
+        <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+        Проверяем сеанс…
+      </main>
+    )
+  }
+
   if (!auth.isAuthenticated) {
     return (
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
