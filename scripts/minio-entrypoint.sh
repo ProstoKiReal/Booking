@@ -35,8 +35,9 @@ if [[ "$ready" != true ]]; then
 fi
 
 /opt/bitnami/minio-client/bin/mc alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
-/opt/bitnami/minio-client/bin/mc mb --ignore-existing local/catalog-images
-/opt/bitnami/minio-client/bin/mc anonymous set download local/catalog-images
+: "${S3_IMAGES_BUCKET:?S3_IMAGES_BUCKET must be set}"
+/opt/bitnami/minio-client/bin/mc mb --ignore-existing "local/$S3_IMAGES_BUCKET"
+/opt/bitnami/minio-client/bin/mc anonymous set download "local/$S3_IMAGES_BUCKET"
 
 touch /tmp/minio-initialized
 wait "$minio_pid"

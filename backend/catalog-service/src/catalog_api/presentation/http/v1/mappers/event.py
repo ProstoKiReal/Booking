@@ -56,7 +56,11 @@ class EventMapper:
             name=event.name,
             description=event.description,
             images=[
-                EventImageResponse(uuid=image.uuid, order=image.order)
+                EventImageResponse(
+                    uuid=image.uuid,
+                    url=image.url,
+                    order=image.order,
+                )
                 for image in event.images
             ],
         )

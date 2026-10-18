@@ -22,7 +22,7 @@ from catalog_api.domain.catalog.errors import (
     ImageNotFoundError,
 )
 from catalog_api.errors import BaseError
-from catalog_api.domain.catalog.value_objects import EventID, ImageID
+from catalog_api.domain.catalog.value_objects import EventID
 
 
 class CreateEventCommandHandler:
@@ -96,9 +96,12 @@ class UpdateEventCommandHandler:
                 if event is None:
                     raise EventNotFoundError(event_id)
 
+                event_image_ids = {
+                    gallery_image.image.id.value
+                    for gallery_image in event.gallery_images
+                }
                 for image_data in event_data.images_data:
-                    image_id = ImageID(image_data.id)
-                    if await self.image_repo.get(image_id) is None:
+                    if image_data.id not in event_image_ids:
                         raise ImageNotFoundError(image_data.id)
 
                 uploaded_image_urls = await self.image_storage_repo.save_batch(
@@ -108,10 +111,15 @@ class UpdateEventCommandHandler:
                     event_data.images_data,
                     uploaded_image_urls,
                 )
+                updated_images = await self.image_repo.update_batch(
+                    [gallery_image.image for gallery_image in gallery_images]
+                )
+                updated_images_by_id = {
+                    image.id.value: image for image in updated_images
+                }
                 for gallery_image in gallery_images:
-                    updated_image = await self.image_repo.update(
-                        gallery_image.image.id,
-                        gallery_image.image,
+                    updated_image = updated_images_by_id.get(
+                        gallery_image.image.id.value
                     )
                     if updated_image is None:
                         raise ImageNotFoundError(gallery_image.image.id.value)

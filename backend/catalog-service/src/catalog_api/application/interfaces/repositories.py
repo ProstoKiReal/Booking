@@ -50,6 +50,9 @@ class ImageRepo(Protocol):
     async def get(self, image_id: ImageID) -> Image | None: ...
 
     @abstractmethod
+    async def update_batch(self, images_data: list[Image]) -> list[Image]: ...
+
+    @abstractmethod
     async def get_all(self) -> list[Image]: ...
 
     @abstractmethod

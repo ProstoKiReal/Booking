@@ -116,6 +116,7 @@ class EventMapper:
             images=[
                 EventImageResponseDTO(
                     uuid=gallery_image.image.id.value,
+                    url=gallery_image.image.url,
                     order=gallery_image.order,
                 )
                 for gallery_image in event.gallery_images

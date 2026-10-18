@@ -40,6 +40,7 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
 
     async def save_batch(self, images_data: list[bytes]) -> list[str]:
         sem = asyncio.Semaphore(_MAX_CONCURRENT)
+        tasks: list[asyncio.Task[str]] = []
         try:
             async with asyncio.TaskGroup() as task_group:
                 tasks = [
@@ -47,7 +48,26 @@ class AioBotocoreImageStorageRepo(ImageStorageRepo):
                     for image_data in images_data
                 ]
         except* ImageStorageError as errors:
-            raise ImageStorageBatchError("Failed to upload image batch to S3.") from errors
+            uploaded_urls = [
+                task.result()
+                for task in tasks
+                if task.done()
+                and not task.cancelled()
+                and task.exception() is None
+            ]
+            if uploaded_urls:
+                try:
+                    await self.delete_batch(uploaded_urls)
+                except ImageStorageError as cleanup_error:
+                    raise ImageStorageBatchError(
+                        "Failed to upload image batch and clean up uploaded images."
+                    ) from ExceptionGroup(
+                        "Image upload and cleanup both failed.",
+                        [errors, cleanup_error],
+                    )
+            raise ImageStorageBatchError(
+                "Failed to upload image batch to S3."
+            ) from errors
         return [task.result() for task in tasks]
 
     async def delete(self, image_url: str) -> None:

@@ -27,6 +27,7 @@ class UpdateEventRequestDTO:
 @dataclass
 class EventImageResponseDTO:
     uuid: UUID
+    url: str
     order: int
 
 

@@ -34,12 +34,17 @@ class UpdateEventForm(BaseModel):
             raise ValueError(
                 "Each uploaded image must have one image ID and one order."
             )
+        if len(self.image_ids) != len(set(self.image_ids)):
+            raise ValueError("Image IDs must be unique.")
+        if len(self.orders) != len(set(self.orders)):
+            raise ValueError("Image orders must be unique.")
 
         return self
 
 
 class EventImageResponse(BaseModel):
     uuid: UUID
+    url: str
     order: int = Field(..., ge=0, le=11)
 
 

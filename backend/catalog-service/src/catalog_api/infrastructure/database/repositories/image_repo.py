@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import case, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from catalog_api.application.interfaces.repositories import ImageRepo
@@ -35,6 +35,30 @@ class AlchemyImageRepo(ImageRepo):
         self.update_model(image_model, image_data)
         await self.session.flush()
         return self.to_domain(image_model)
+
+    async def update_batch(self, images_data: list[Image]) -> list[Image]:
+        if not images_data:
+            return []
+
+        image_urls = {
+            image.id.value: image.url
+            for image in images_data
+        }
+        result = await self.session.execute(
+            update(ImageSaModel)
+            .where(ImageSaModel.id.in_(image_urls))
+            .values(url=case(image_urls, value=ImageSaModel.id))
+            .returning(ImageSaModel)
+        )
+        updated_images = {
+            image.id: self.to_domain(image)
+            for image in result.scalars().all()
+        }
+        return [
+            updated_images[image.id.value]
+            for image in images_data
+            if image.id.value in updated_images
+        ]
 
     async def delete(self, image_id: ImageID) -> None:
         image = await self.session.get(ImageSaModel, image_id.value)
