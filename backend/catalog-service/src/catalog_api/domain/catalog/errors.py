@@ -31,6 +31,26 @@ class CategoryNotFoundError(BaseCatalogDomainError):
         super().__init__(f"Category '{category_id}' was not found.")
 
 
+class EventNotFoundError(BaseCatalogDomainError):
+    def __init__(self, event_id: UUID) -> None:
+        super().__init__(f"Event '{event_id}' was not found.")
+
+
+class ImageNotFoundError(BaseCatalogDomainError):
+    def __init__(self, image_id: UUID) -> None:
+        super().__init__(f"Image '{image_id}' was not found.")
+
+
 class CategoryOldNameEquivalentNewNameError(BaseCatalogDomainError):
     def __init__(self, old: str, new) -> None:
         super().__init__(f"Category  old name '{old}' equivalent new name '{new}'.")
+
+
+class ImageGalleryInvalidOrderError(BaseCatalogDomainError):
+    def __init__(self, order: int) -> None:
+        super().__init__(f"Image gallery order '{order}' is invalid. Must be in range 0-12.")
+
+
+class ImageGalleryInvalidCountError(BaseCatalogDomainError):
+    def __init__(self, count: int) -> None:
+        super().__init__(f"Image gallery count '{count}' is invalid. Must be in range 0-12.")

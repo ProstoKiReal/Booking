@@ -1,2 +1,5 @@
-class BaseDomainError(Exception):
+from catalog_api.errors import BaseError
+
+
+class BaseDomainError(BaseError):
     pass

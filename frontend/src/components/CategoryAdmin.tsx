@@ -58,6 +58,7 @@ interface CategoryAdminProps {
   userName: string
   authErrorMessage: string
   onGoHome: () => void
+  onOpenEvents: () => void
   onOpenProfile: () => void
   onSignOut: () => void
 }
@@ -74,6 +75,7 @@ type CategoryNameValues = z.infer<typeof categoryNameSchema>
 
 const categoriesQueryKey = ['categories'] as const
 const pageSize = 10
+const categoryApiPageSize = 100
 
 function categoryWord(count: number): string {
   const lastTwoDigits = count % 100
@@ -130,6 +132,7 @@ function CategoryAdmin({
   userName,
   authErrorMessage,
   onGoHome,
+  onOpenEvents,
   onOpenProfile,
   onSignOut,
 }: CategoryAdminProps) {
@@ -158,20 +161,34 @@ function CategoryAdmin({
   const categoriesQuery = useQuery({
     queryKey: categoriesQueryKey,
     queryFn: async (): Promise<Category[]> => {
-      const response = await authorizedFetch('/api/v1/public/categories/')
-      if (!response.ok) {
-        throw await responseError(response, 'Не удалось загрузить категории')
-      }
+      const categories: Category[] = []
 
-      const payload: unknown = await response.json()
-      if (
-        !isRecord(payload) ||
-        !Array.isArray(payload.result) ||
-        !payload.result.every(isCategory)
-      ) {
-        throw new Error('Сервер вернул список категорий в неожиданном формате.')
+      for (let offset = 0; ; offset += categoryApiPageSize) {
+        const response = await authorizedFetch(
+          `/api/v1/public/categories/?offset=${offset}&limit=${categoryApiPageSize}`,
+        )
+        if (!response.ok) {
+          throw await responseError(
+            response,
+            'Не удалось загрузить категории',
+          )
+        }
+
+        const payload: unknown = await response.json()
+        if (
+          !isRecord(payload) ||
+          !Array.isArray(payload.result) ||
+          !payload.result.every(isCategory)
+        ) {
+          throw new Error(
+            'Сервер вернул список категорий в неожиданном формате.',
+          )
+        }
+
+        const page = payload.result
+        categories.push(...page)
+        if (page.length < categoryApiPageSize) return categories
       }
-      return payload.result
     },
   })
 
@@ -324,13 +341,21 @@ function CategoryAdmin({
               type="button"
             >
               <Home className="size-4" aria-hidden="true" />
-              Мероприятия
+              Афиша
             </button>
           </div>
           <div className="space-y-1">
             <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">
               УПРАВЛЕНИЕ
             </p>
+            <button
+              className="flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={onOpenEvents}
+              type="button"
+            >
+              <CalendarDays className="size-4" aria-hidden="true" />
+              Мероприятия
+            </button>
             <div
               aria-current="page"
               className="flex h-9 items-center gap-3 rounded-lg bg-primary/10 px-3 text-sm font-medium text-primary"

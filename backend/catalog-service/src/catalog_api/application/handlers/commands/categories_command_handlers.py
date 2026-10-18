@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from catalog_api.application.dtos.category import (
     CreateCategoryRequestDTO,
     CreateCategoryResponseDTO,
@@ -10,18 +12,16 @@ from catalog_api.application.interfaces.repositories import CategoryRepo
 from catalog_api.application.mappers import CategoryMapper
 from catalog_api.domain.catalog.errors import CategoryNotFoundError
 from catalog_api.domain.catalog.value_objects import CategoryID
-from catalog_api.infrastructure.database.tx_manager import TXManager
-
 
 class CreateCategoryCommandHandler:
     def __init__(
         self, 
         category_repo: CategoryRepo,
-        tx_manager: TXManager,
+        session: AsyncSession,
         mapper: CategoryMapper,
     ):
         self.category_repo = category_repo
-        self.tx_manager = tx_manager
+        self.session = session
         self.mapper = mapper
 
     async def __call__(
@@ -29,7 +29,7 @@ class CreateCategoryCommandHandler:
         category_data: CreateCategoryRequestDTO,
     ) -> CreateCategoryResponseDTO:
         category = self.mapper.to_domain(category_data)
-        async with self.tx_manager:
+        async with self.session.begin():
             unique = await self.category_repo.exists_by_name(category.name)
             category.is_unique(unique)
             created_category = await self.category_repo.create(category)
@@ -40,11 +40,11 @@ class UpdateCategoryCommandHandler:
     def __init__(
         self, 
         category_repo: CategoryRepo,
-        tx_manager: TXManager,
+        session: AsyncSession,
         mapper: CategoryMapper,
     ):
         self.category_repo = category_repo
-        self.tx_manager = tx_manager
+        self.session = session
         self.mapper = mapper
 
     async def __call__(
@@ -54,7 +54,7 @@ class UpdateCategoryCommandHandler:
     ) -> UpdateCategoryResponseDTO:
         category_id_value = CategoryID(category_id)
         category = self.mapper.to_domain(category_data, category_id_value)
-        async with self.tx_manager:
+        async with self.session.begin():
             old_category = await self.category_repo.get(category_id_value)
             if old_category is None:
                 raise CategoryNotFoundError(category_id)
@@ -69,14 +69,14 @@ class DeleteCategoryCommandHandler:
     def __init__(
         self, 
         category_repo: CategoryRepo,
-        tx_manager: TXManager,
+        session: AsyncSession,
     ):
         self.category_repo = category_repo
-        self.tx_manager = tx_manager
+        self.session = session
     
     async def __call__(self, category_id: UUID) -> None:
         category_id_value = CategoryID(category_id)
-        async with self.tx_manager:
+        async with self.session.begin():
             category = await self.category_repo.get(category_id_value)
             if category is None:
                 raise CategoryNotFoundError(category_id)

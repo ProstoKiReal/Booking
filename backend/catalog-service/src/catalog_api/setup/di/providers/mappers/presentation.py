@@ -6,6 +6,8 @@ from catalog_api.presentation.http.v1.mappers.category import (
     GetListCategoryMapper,
     UpdateCategoryMapper,
 )
+from catalog_api.presentation.http.v1.mappers.event import EventMapper
+from catalog_api.presentation.http.v1.mappers.list_filters import ListFiltersMapper
 
 
 class PresentationMappersProvider(Provider):
@@ -26,3 +28,11 @@ class PresentationMappersProvider(Provider):
     @provide
     def get_list_category_mapper(self) -> GetListCategoryMapper:
         return GetListCategoryMapper()
+
+    @provide
+    def event_mapper(self) -> EventMapper:
+        return EventMapper()
+
+    @provide
+    def list_filters_mapper(self) -> ListFiltersMapper:
+        return ListFiltersMapper()

@@ -6,14 +6,24 @@ import LoginPage from './components/LoginPage'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const CategoryAdmin = lazy(() => import('./components/CategoryAdmin'))
+const EventAdmin = lazy(() => import('./components/EventAdmin'))
 const EventsPage = lazy(() => import('./components/EventsPage'))
 const ProfilePage = lazy(() => import('./components/ProfilePage'))
 
-type CurrentView = 'home' | 'profile' | 'admin'
+type CurrentView = 'home' | 'profile' | 'admin' | 'admin-events'
 
 function App() {
   const auth = useAuth()
   const [currentView, setCurrentView] = useState<CurrentView>('home')
+
+  if (!auth.isReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center gap-2 text-sm text-muted-foreground">
+        <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+        Проверяем сеанс…
+      </main>
+    )
+  }
 
   if (!auth.isAuthenticated) {
     return (
@@ -29,14 +39,47 @@ function App() {
 
   if (currentView === 'admin' && auth.canManageCategories) {
     return (
-      <CategoryAdmin
-        authorizedFetch={auth.authorizedFetch}
-        userName={auth.userName}
-        authErrorMessage={auth.errorMessage}
-        onGoHome={() => setCurrentView('home')}
-        onOpenProfile={() => setCurrentView('profile')}
-        onSignOut={auth.signOut}
-      />
+      <Suspense
+        fallback={
+          <p className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+            Загрузка…
+          </p>
+        }
+      >
+        <CategoryAdmin
+          authorizedFetch={auth.authorizedFetch}
+          userName={auth.userName}
+          authErrorMessage={auth.errorMessage}
+          onGoHome={() => setCurrentView('home')}
+          onOpenEvents={() => setCurrentView('admin-events')}
+          onOpenProfile={() => setCurrentView('profile')}
+          onSignOut={auth.signOut}
+        />
+      </Suspense>
+    )
+  }
+
+  if (currentView === 'admin-events' && auth.canManageCategories) {
+    return (
+      <Suspense
+        fallback={
+          <p className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+            Загрузка…
+          </p>
+        }
+      >
+        <EventAdmin
+          authorizedFetch={auth.authorizedFetch}
+          userName={auth.userName}
+          authErrorMessage={auth.errorMessage}
+          onGoHome={() => setCurrentView('home')}
+          onOpenCategories={() => setCurrentView('admin')}
+          onOpenProfile={() => setCurrentView('profile')}
+          onSignOut={auth.signOut}
+        />
+      </Suspense>
     )
   }
 

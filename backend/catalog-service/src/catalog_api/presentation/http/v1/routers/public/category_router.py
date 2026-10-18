@@ -1,6 +1,7 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import status
+from fastapi import Query, status
 from dishka.integrations.fastapi import FromDishka
 from fastapi_error_map import ErrorAwareRouter
 
@@ -13,10 +14,12 @@ from catalog_api.presentation.http.v1.mappers.category import (
     GetCategoryMapper,
     GetListCategoryMapper,
 )
+from catalog_api.presentation.http.v1.mappers.list_filters import ListFiltersMapper
 from catalog_api.presentation.http.v1.schemas.category import (
     GetCategoryResponse,
     GetListCategoryResponse,
 )
+from catalog_api.presentation.http.v1.schemas.list_filters import ListFilters
 from catalog_api.domain.catalog.errors import (
     CategoryAlreadyExistsError,
     CategoryNameEmptyError,
@@ -45,10 +48,12 @@ router = ErrorAwareRouter(
 
 @router.get("/", response_model=GetListCategoryResponse)
 async def list_categories(
+    filters: Annotated[ListFilters, Query()],
     handler: FromDishka[ListCategoriesQueryHandler],
     mapper: FromDishka[GetListCategoryMapper],
+    filters_mapper: FromDishka[ListFiltersMapper],
 ) -> GetListCategoryResponse:
-    categories = await handler()
+    categories = await handler(filters_mapper.to_dto(filters))
     return mapper.to_response(categories)
 
 

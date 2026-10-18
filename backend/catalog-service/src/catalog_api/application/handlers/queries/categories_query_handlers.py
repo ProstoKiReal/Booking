@@ -4,6 +4,7 @@ from catalog_api.application.dtos.category import (
     GetCategoryResponseDTO,
     GetListCategoryResponseDTO,
 )
+from catalog_api.application.dtos.list_filters import ListFiltersDTO
 from catalog_api.application.interfaces.repositories import CategoryRepo
 from catalog_api.application.mappers import CategoryMapper
 from catalog_api.domain.catalog.errors import CategoryNotFoundError
@@ -27,6 +28,9 @@ class ListCategoriesQueryHandler:
         self.category_repo = category_repo
         self.mapper = mapper
 
-    async def __call__(self) -> GetListCategoryResponseDTO:
-        categories = await self.category_repo.get_all()
+    async def __call__(
+        self,
+        filters: ListFiltersDTO,
+    ) -> GetListCategoryResponseDTO:
+        categories = await self.category_repo.get_all(filters)
         return self.mapper.to_list_dto(categories)
