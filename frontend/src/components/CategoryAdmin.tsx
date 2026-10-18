@@ -58,6 +58,7 @@ interface CategoryAdminProps {
   userName: string
   authErrorMessage: string
   onGoHome: () => void
+  onOpenEvents: () => void
   onOpenProfile: () => void
   onSignOut: () => void
 }
@@ -130,6 +131,7 @@ function CategoryAdmin({
   userName,
   authErrorMessage,
   onGoHome,
+  onOpenEvents,
   onOpenProfile,
   onSignOut,
 }: CategoryAdminProps) {
@@ -324,13 +326,21 @@ function CategoryAdmin({
               type="button"
             >
               <Home className="size-4" aria-hidden="true" />
-              Мероприятия
+              Афиша
             </button>
           </div>
           <div className="space-y-1">
             <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">
               УПРАВЛЕНИЕ
             </p>
+            <button
+              className="flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={onOpenEvents}
+              type="button"
+            >
+              <CalendarDays className="size-4" aria-hidden="true" />
+              Мероприятия
+            </button>
             <div
               aria-current="page"
               className="flex h-9 items-center gap-3 rounded-lg bg-primary/10 px-3 text-sm font-medium text-primary"

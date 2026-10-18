@@ -115,6 +115,9 @@ function ProfilePage({ profile: tokenProfile, keycloakApiFetch }: ProfilePagePro
     queryFn: async () => {
       const response = await keycloakApiFetch('/account')
       await throwForResponse(response, 'Не удалось загрузить профиль')
+      if (!response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error('Keycloak вернул профиль не в формате JSON.')
+      }
       return accountProfileFrom(await response.json(), tokenProfile)
     },
     initialData: tokenProfile

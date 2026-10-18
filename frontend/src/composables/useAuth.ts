@@ -57,11 +57,16 @@ export function useAuth() {
 
       const headers = new Headers(init?.headers)
       headers.set('Authorization', `Bearer ${keycloak.token}`)
-      if (init?.body) {
+      headers.set('Accept', 'application/json')
+      if (init?.body && !(init.body instanceof FormData)) {
         headers.set('Content-Type', 'application/json')
       }
 
-      if (init?.body && !headers.has('Content-Type')) {
+      if (
+        init?.body &&
+        !(init.body instanceof FormData) &&
+        !headers.has('Content-Type')
+      ) {
         headers.set('Content-Type', 'application/json')
       }
 
@@ -82,7 +87,7 @@ export function useAuth() {
 
       const headers = new Headers(init?.headers)
       headers.set('Authorization', `Bearer ${keycloak.token}`)
-      if (init?.body) {
+      if (init?.body && !(init.body instanceof FormData)) {
         headers.set('Content-Type', 'application/json')
       }
 
