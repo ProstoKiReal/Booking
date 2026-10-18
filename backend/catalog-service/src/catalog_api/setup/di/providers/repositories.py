@@ -1,4 +1,4 @@
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope
 from aiobotocore.client import AioBaseClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,33 +19,22 @@ from catalog_api.infrastructure.storage.image import AioBotocoreImageStorageRepo
 from catalog_api.setup.config import Config
 
 
-class RepositoriesProvider(Provider):
-    scope = Scope.REQUEST
+def image_storage_repo(
+    client: AioBaseClient,
+    config: Config,
+) -> ImageStorageRepo:
+    return AioBotocoreImageStorageRepo(
+        client=client,
+        bucket=config.s3.IMAGES_BUCKET,
+        public_endpoint=config.s3.PUBLIC_URL,
+    )
 
-    @provide
-    def category_repo(self, session: AsyncSession) -> CategoryRepo:
-        return AlchemyCategoryRepo(session=session)
 
-    @provide
-    def event_repo(self, session: AsyncSession) -> EventRepo:
-        return AlchemyEventRepo(session=session)
-
-    @provide
-    def gallery_image_repo(self, session: AsyncSession) -> GalleryImageRepo:
-        return AlchemyGalleryImageRepo(session=session)
-
-    @provide
-    def image_repo(self, session: AsyncSession) -> ImageRepo:
-        return AlchemyImageRepo(session=session)
-
-    @provide
-    def image_storage_repo(
-        self,
-        client: AioBaseClient,
-        config: Config,
-    ) -> ImageStorageRepo:
-        return AioBotocoreImageStorageRepo(
-            client=client,
-            bucket=config.s3.IMAGES_BUCKET,
-            public_endpoint=config.s3.PUBLIC_URL,
-        )
+def repositories_provider() -> Provider:
+    provider = Provider(scope=Scope.REQUEST)
+    provider.provide(source=AlchemyCategoryRepo, provides=CategoryRepo)
+    provider.provide(source=AlchemyEventRepo, provides=EventRepo)
+    provider.provide(source=AlchemyGalleryImageRepo, provides=GalleryImageRepo)
+    provider.provide(source=AlchemyImageRepo, provides=ImageRepo)
+    provider.provide(source=image_storage_repo)
+    return provider

@@ -3,23 +3,23 @@ from typing import Iterable
 from dishka import Provider
 
 from catalog_api.setup.di.providers import (
-    DBProvider,
-    HandlersProvider,
-    S3Provider,
-    ApplicationMappersProvider,
-    PresentationMappersProvider,
-    RepositoriesProvider,
-    ServicesProvider,
+    application_mappers_provider,
+    db_provider,
+    handlers_provider,
+    presentation_mappers_provider,
+    repositories_provider,
+    s3_provider,
+    services_provider,
 )
 
 
 def get_providers() -> Iterable[Provider]:
     return (
-        DBProvider(),
-        S3Provider(),
-        RepositoriesProvider(),
-        ServicesProvider(),
-        HandlersProvider(),
-        PresentationMappersProvider(),
-        ApplicationMappersProvider(),
+        db_provider(),
+        s3_provider(),
+        repositories_provider(),
+        services_provider(),
+        handlers_provider(),
+        presentation_mappers_provider(),
+        application_mappers_provider(),
     )

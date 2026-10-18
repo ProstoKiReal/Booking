@@ -1,15 +1,10 @@
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope
 
 from catalog_api.application.mappers import CategoryMapper, EventMapper
 
 
-class ApplicationMappersProvider(Provider):
-    scope = Scope.APP
-
-    @provide
-    def category_mapper(self) -> CategoryMapper:
-        return CategoryMapper()
-
-    @provide
-    def event_mapper(self) -> EventMapper:
-        return EventMapper()
+def application_mappers_provider() -> Provider:
+    provider = Provider(scope=Scope.APP)
+    provider.provide(source=CategoryMapper)
+    provider.provide(source=EventMapper)
+    return provider
