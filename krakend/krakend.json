@@ -166,6 +166,7 @@
       "endpoint": "/api/v1/public/events/",
       "method": "GET",
       "output_encoding": "no-op",
+      "input_query_strings": ["offset", "limit", "category_id"],
       "backend": [
         {
           "url_pattern": "/api/v1/public/events/",
@@ -190,6 +191,7 @@
       "endpoint": "/api/v1/public/categories/",
       "method": "GET",
       "output_encoding": "no-op",
+      "input_query_strings": ["offset", "limit"],
       "backend": [
         {
           "url_pattern": "/api/v1/public/categories/",

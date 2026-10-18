@@ -240,7 +240,7 @@ function EventDetailsPage({
 
           <Card className="border-border/70 shadow-sm">
             <CardHeader>
-              <CardTitle>Об мероприятии</CardTitle>
+              <CardTitle>О мероприятии</CardTitle>
               {categoryName && (
                 <CardDescription>Категория: {categoryName}</CardDescription>
               )}

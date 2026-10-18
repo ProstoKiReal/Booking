@@ -75,6 +75,7 @@ type CategoryNameValues = z.infer<typeof categoryNameSchema>
 
 const categoriesQueryKey = ['categories'] as const
 const pageSize = 10
+const categoryApiPageSize = 100
 
 function categoryWord(count: number): string {
   const lastTwoDigits = count % 100
@@ -160,20 +161,34 @@ function CategoryAdmin({
   const categoriesQuery = useQuery({
     queryKey: categoriesQueryKey,
     queryFn: async (): Promise<Category[]> => {
-      const response = await authorizedFetch('/api/v1/public/categories/')
-      if (!response.ok) {
-        throw await responseError(response, 'Не удалось загрузить категории')
-      }
+      const categories: Category[] = []
 
-      const payload: unknown = await response.json()
-      if (
-        !isRecord(payload) ||
-        !Array.isArray(payload.result) ||
-        !payload.result.every(isCategory)
-      ) {
-        throw new Error('Сервер вернул список категорий в неожиданном формате.')
+      for (let offset = 0; ; offset += categoryApiPageSize) {
+        const response = await authorizedFetch(
+          `/api/v1/public/categories/?offset=${offset}&limit=${categoryApiPageSize}`,
+        )
+        if (!response.ok) {
+          throw await responseError(
+            response,
+            'Не удалось загрузить категории',
+          )
+        }
+
+        const payload: unknown = await response.json()
+        if (
+          !isRecord(payload) ||
+          !Array.isArray(payload.result) ||
+          !payload.result.every(isCategory)
+        ) {
+          throw new Error(
+            'Сервер вернул список категорий в неожиданном формате.',
+          )
+        }
+
+        const page = payload.result
+        categories.push(...page)
+        if (page.length < categoryApiPageSize) return categories
       }
-      return payload.result
     },
   })
 

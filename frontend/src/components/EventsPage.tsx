@@ -42,6 +42,7 @@ interface EventsPageProps {
 }
 
 const pageSize = 9
+const categoryPageSize = 100
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -93,21 +94,29 @@ function EventsPage({ authorizedFetch }: EventsPageProps) {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
   const categoriesQuery = useQuery({
-    queryKey: ['public-categories', 100],
+    queryKey: ['public-categories'],
     queryFn: async (): Promise<Category[]> => {
-      const response = await authorizedFetch(
-        '/api/v1/public/categories/?offset=0&limit=100',
-      )
-      if (!response.ok) {
-        throw new Error(
-          `Не удалось загрузить категории (HTTP ${response.status}).`,
+      const categories: Category[] = []
+
+      for (let offset = 0; ; offset += categoryPageSize) {
+        const response = await authorizedFetch(
+          `/api/v1/public/categories/?offset=${offset}&limit=${categoryPageSize}`,
         )
+        if (!response.ok) {
+          throw new Error(
+            `Не удалось загрузить категории (HTTP ${response.status}).`,
+          )
+        }
+
+        const page = readList(
+          await response.json(),
+          isCategory,
+          'Сервис категорий вернул данные в неожиданном формате.',
+        )
+        categories.push(...page)
+
+        if (page.length < categoryPageSize) return categories
       }
-      return readList(
-        await response.json(),
-        isCategory,
-        'Сервис категорий вернул данные в неожиданном формате.',
-      )
     },
   })
 

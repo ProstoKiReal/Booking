@@ -432,7 +432,6 @@ function EventAdmin({
           </span>
           <div className="flex items-center gap-2">
             <Button
-              className="hidden sm:inline-flex"
               onClick={onGoHome}
               size="sm"
               variant="ghost"
@@ -440,7 +439,6 @@ function EventAdmin({
               Афиша
             </Button>
             <Button
-              className="hidden sm:inline-flex"
               onClick={onOpenCategories}
               size="sm"
               variant="ghost"
@@ -448,7 +446,7 @@ function EventAdmin({
               Категории
             </Button>
             <Button
-              className="hidden gap-2 sm:inline-flex"
+              className="gap-2"
               onClick={onOpenProfile}
               size="sm"
               variant="ghost"
