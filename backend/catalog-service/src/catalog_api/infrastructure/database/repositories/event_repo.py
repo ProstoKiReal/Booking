@@ -6,6 +6,7 @@ from sqlalchemy import Select, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from catalog_api.application.dtos.list_filters import ListFiltersDTO
 from catalog_api.application.interfaces.repositories import EventRepo
 from catalog_api.domain.catalog.entities import Event, GalleryImage, Image
 from catalog_api.domain.catalog.value_objects import CategoryID, EventID, ImageID
@@ -56,9 +57,16 @@ class AlchemyEventRepo(EventRepo):
         event = result.scalar_one_or_none()
         return self.to_domain(event) if event else None
 
-    async def get_all(self) -> list[Event]:
+    async def get_all(self, filters: ListFiltersDTO) -> list[Event]:
+        query = self._get_query()
+        if filters.category_id is not None:
+            query = query.where(
+                EventSaModel.category_id == filters.category_id
+            )
         result = await self.session.execute(
-            self._get_query().order_by(EventSaModel.id)
+            query.order_by(EventSaModel.id)
+            .offset(filters.offset)
+            .limit(filters.limit)
         )
         return [self.to_domain(event) for event in result.scalars().all()]
 

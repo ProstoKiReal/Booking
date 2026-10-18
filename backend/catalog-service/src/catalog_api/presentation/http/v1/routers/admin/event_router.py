@@ -1,8 +1,9 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Form, status
+from fastapi import Form, status
 from dishka.integrations.fastapi import FromDishka
+from fastapi_error_map import ErrorAwareRouter
 
 from catalog_api.application.handlers.commands.events_command_handlers import (
     CreateEventCommandHandler,
@@ -16,7 +17,7 @@ from catalog_api.domain.catalog.errors import (
     ImageGalleryInvalidOrderError,
     ImageNotFoundError,
 )
-from catalog_api.presentation.http.http_route import DishkaRoute
+from catalog_api.presentation.http.http_route import DishkaErrorAwareRoute
 from catalog_api.presentation.http.v1.mappers.event import EventMapper
 from catalog_api.presentation.http.v1.schemas.event import (
     CreateEventForm,
@@ -33,10 +34,10 @@ error_map = {
 }
 
 
-router = APIRouter(
-    prefix="/events", 
+router = ErrorAwareRouter(
+    prefix="/events",
     tags=["Admin Events"],
-    route_class=DishkaRoute,
+    route_class=DishkaErrorAwareRoute,
 )
 
 

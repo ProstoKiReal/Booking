@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol
 
+from catalog_api.application.dtos.list_filters import ListFiltersDTO
 from catalog_api.domain.catalog.entities import Category, Event, GalleryImage, Image
 from catalog_api.domain.catalog.value_objects import EventID, CategoryID, ImageID
 
@@ -13,7 +14,10 @@ class EventRepo(Protocol):
     async def get(self, event_id: EventID) -> Event | None: ...
 
     @abstractmethod
-    async def get_all(self) -> list[Event]: ...
+    async def get_all(
+        self,
+        filters: ListFiltersDTO,
+    ) -> list[Event]: ...
 
     @abstractmethod
     async def delete(self, event_id: EventID) -> None: ...
@@ -33,7 +37,10 @@ class CategoryRepo(Protocol):
     async def get(self, category_id: CategoryID) -> Category | None: ...
 
     @abstractmethod
-    async def get_all(self) -> list[Category]: ...
+    async def get_all(
+        self,
+        filters: ListFiltersDTO,
+    ) -> list[Category]: ...
 
     @abstractmethod
     async def delete(self, category_id: CategoryID) -> None: ...

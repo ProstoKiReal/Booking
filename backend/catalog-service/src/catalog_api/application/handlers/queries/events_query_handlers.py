@@ -4,6 +4,7 @@ from catalog_api.application.dtos.event import (
     EventResponseDTO,
     GetListEventResponseDTO,
 )
+from catalog_api.application.dtos.list_filters import ListFiltersDTO
 from catalog_api.application.interfaces.repositories import EventRepo
 from catalog_api.application.mappers import EventMapper
 from catalog_api.domain.catalog.errors import EventNotFoundError
@@ -15,8 +16,11 @@ class ListEventsQueryHandler:
         self.event_repo = event_repo
         self.mapper = mapper
 
-    async def __call__(self) -> GetListEventResponseDTO:
-        events = await self.event_repo.get_all()
+    async def __call__(
+        self,
+        filters: ListFiltersDTO,
+    ) -> GetListEventResponseDTO:
+        events = await self.event_repo.get_all(filters)
         return self.mapper.to_list_dto(events)
 
 

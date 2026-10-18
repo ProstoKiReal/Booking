@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete, select, update
 
+from catalog_api.application.dtos.list_filters import ListFiltersDTO
 from catalog_api.application.interfaces.repositories import CategoryRepo
 from catalog_api.infrastructure.database.models import CategorySaModel
 from catalog_api.domain.catalog.entities import Category
@@ -29,8 +30,15 @@ class AlchemyCategoryRepo(CategoryRepo):
         category = result.scalar_one_or_none()
         return self.to_domain(category) if category else None
 
-    async def get_all(self) -> list[Category]:
+    async def get_all(self, filters: ListFiltersDTO) -> list[Category]:
         query = select(CategorySaModel)
+        if filters.category_id is not None:
+            query = query.where(CategorySaModel.id == filters.category_id)
+        query = (
+            query.order_by(CategorySaModel.id)
+            .offset(filters.offset)
+            .limit(filters.limit)
+        )
         result = await self.session.execute(query)
         categories = result.scalars().all()
         return [self.to_domain(category) for category in categories]
